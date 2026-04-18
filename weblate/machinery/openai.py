@@ -43,14 +43,14 @@ class BaseOpenAITranslation(BaseLLMTranslation):
             | ChatCompletionAssistantMessageParam
         ] = [
             ChatCompletionSystemMessageParam(role="system", content=prompt),
-            ChatCompletionUserMessageParam(
-                role="user",
-                content=previous_content,
-            ),
-            ChatCompletionAssistantMessageParam(
-                role="assistant",
-                content=previous_response,
-            ),
+            # ChatCompletionUserMessageParam(
+            #     role="user",
+            #     content=previous_content,
+            # ),
+            # ChatCompletionAssistantMessageParam(
+            #     role="assistant",
+            #     content=previous_response,
+            # ),
             ChatCompletionUserMessageParam(
                 role="user",
                 content=content,

@@ -526,31 +526,8 @@ class BaseLLMTranslation(BatchMachineTranslation):
 
         # Build previous messages for better anchoring assistant responses
         # TODO: This might use existing translations instead of hard-coded example
-        previous_content = self._build_message(
-            "en",
-            "cs",
-            [
-                {
-                    "source": f"Hello, {self.format_replacement(2, 2, '', None)}, how are you?"
-                },
-                {
-                    "source": f"{self.format_replacement(1, 12, '', None)} failing checks"
-                },
-                {"source": "Good morning"},
-                {
-                    "source": f'To continue, click <a href="/x">log out</a> and use {self.format_replacement(195, 195, "", None)}.'
-                },
-            ],
-            {"Hello": "Nazdar"},
-        )
-        previous_response = json.dumps(
-            [
-                f"Nazdar {self.format_replacement(2, 2, '', None)}, jak se máš?",
-                f"{self.format_replacement(1, 12, '', None)} selhavších kontrol",
-                "Dobré ráno",
-                f'Chcete-li pokračovat, klikněte na <a href="/x">odhlásit se</a> a použijte {self.format_replacement(195, 195, "", None)}.',
-            ],
-        )
+        previous_content = ""
+        previous_response = ""
         add_breadcrumb(self.name, "prompt", prompt=prompt)
         add_breadcrumb(self.name, "chat", content=content)
 
