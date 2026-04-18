@@ -92,11 +92,17 @@ class Command(WeblateLangCommand):
             default="",
             help="Optional style text to inject into the system prompt",
         )
+        parser.add_argument(
+            "--skip-system",
+            action="store_true",
+            help="Skip injecting the system prompt",
+        )
 
     def _iter_training_units(self, translation: Translation) -> Iterator[Unit]:
         units = (
             translation.unit_set.filter(state__gte=STATE_TRANSLATED)
             .exclude(target="")
+            .exclude(check__name="same")
             .order_by("pk")
             .prefetch()
         )
@@ -110,7 +116,7 @@ class Command(WeblateLangCommand):
 
     def _build_example(
         self,
-        prompt: str,
+        prompt: str | None,
         batch: list[Unit],
         source_code: str,
         target_code: str,
@@ -154,13 +160,12 @@ class Command(WeblateLangCommand):
             ensure_ascii=False,
         )
         assistant_content = json.dumps(responses, ensure_ascii=False)
-        return {
-            "messages": [
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": user_content},
-                {"role": "assistant", "content": assistant_content},
-            ]
-        }
+        messages: list[dict[str, str]] = []
+        if prompt is not None:
+            messages.append({"role": "system", "content": prompt})
+        messages.append({"role": "user", "content": user_content})
+        messages.append({"role": "assistant", "content": assistant_content})
+        return {"messages": messages}
 
     def handle(self, *args, **options) -> None:
         batch_size = options["batch_size"]
@@ -169,7 +174,11 @@ class Command(WeblateLangCommand):
             raise CommandError(msg)
 
         translations = self.get_translations(**options).exclude_source()
-        prompt = _build_system_prompt(options["persona"], options["style"])
+        prompt: str | None = (
+            None
+            if options["skip_system"]
+            else _build_system_prompt(options["persona"], options["style"])
+        )
 
 
         with open(options["output"], "w", encoding="utf-8") as fh:
