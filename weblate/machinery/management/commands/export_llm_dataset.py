@@ -63,6 +63,9 @@ class Command(WeblateLangCommand):
         "(JSONL chat format, compatible with datasets.load_dataset)"
     )
 
+    written = 0
+    skipped = 0
+
     def add_arguments(self, parser: CommandParser) -> None:
         super().add_arguments(parser)
         parser.add_argument(
@@ -134,10 +137,13 @@ class Command(WeblateLangCommand):
                 target_raw, source_text, unit
             )
             if target_text is None:
-                return None
+                self.skipped += 1
+                continue
             strings.append({"source": source_text})
             responses.append(target_text)
 
+        if len(strings) == 0:
+            return None
         user_content = json.dumps(
             {
                 "source_language": source_code,
@@ -165,8 +171,7 @@ class Command(WeblateLangCommand):
         translations = self.get_translations(**options).exclude_source()
         prompt = _build_system_prompt(options["persona"], options["style"])
 
-        written = 0
-        skipped = 0
+
         with open(options["output"], "w", encoding="utf-8") as fh:
             for translation in translations:
                 source_code = translation.component.source_language.code
@@ -180,13 +185,12 @@ class Command(WeblateLangCommand):
                         prompt, batch, source_code, target_code
                     )
                     if example is None:
-                        skipped += len(batch)
                         continue
                     fh.write(json.dumps(example, ensure_ascii=False))
                     fh.write("\n")
-                    written += 1
+                    self.written += 1
 
         self.stdout.write(
-            f"Exported {written} example(s); "
-            f"skipped {skipped} unit(s) due to placeholder mismatches."
+            f"Exported {self.written} example(s); "
+            f"skipped {self.skipped} unit(s) due to placeholder mismatches."
         )
