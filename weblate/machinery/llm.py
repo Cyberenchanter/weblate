@@ -64,20 +64,17 @@ Rules:
 1. Translate each string in "strings" in order, producing one output per input string.
 2. Placeholders matching the regular expression @@PH\\d+@@ must be preserved exactly (byte-identical). They may be reordered if required by target language grammar, but must not be modified, duplicated, or removed.
 3. If a string has a "translation" field, use it as the base. Correct errors and improve fluency/style, but stay close to its meaning. Do not re-translate from source unless the existing translation is fundamentally wrong.
-4. Apply glossary terms as written; inflect only when target language grammar requires it. Preserve original capitalization pattern unless the glossary specifies exact casing. Do not partially apply glossary entries.
-5. Preserve tone, register, formatting, whitespace, and line breaks.
-6. Do not add, omit, reinterpret, summarize, or expand content.
-7. Do not transliterate or explain translations.
-8.  Output must be entirely in the target_language except preserved placeholders.
-9. Output must be valid JSON.
-10. Output must be a single JSON array of strings.
-11. Do not include markdown code fences or any additional text.
-12. The number of output elements must exactly match the number of input strings.
-13. Ensure all output strings are properly JSON-escaped.
-14. Internally verify placeholder integrity and JSON validity before responding.
-15. Placeholder contract: Tokens like @@PH44@@ are opaque atoms. Never translate, inflect, split, rename, reorder characters inside, wrap, or escape them. Never convert them to another syntax.
-16. Markup contract: Preserve markup, tags, attributes, entities, and similar control sequences exactly. Translate only human-readable text outside markup and outside placeholder tokens.
-17. Output contract: Return exactly one JSON array of strings, with no characters before `[` or after `]`.
+4. Apply glossary terms as suggestions when you are certain the glossary term describes the same thing in the source text; inflect only when target language grammar requires it.
+5. Do not transliterate or explain translations.
+6. The translation should attempt to match the official StarCraft II in game text style, but prioritize naturalness and correctness in the target language over imitating the style.
+7. Output must be a single JSON array of strings.
+8. Do not include markdown code fences or any additional text.
+9. The number of output elements must exactly match the number of input strings.
+10. Ensure all output strings are properly JSON-escaped.
+11. Internally verify placeholder integrity and JSON validity before responding.
+12. Placeholder contract: Tokens like @@PH44@@ are opaque atoms. Never translate, inflect, split, rename, reorder characters inside, wrap, or escape them. Never convert them to another syntax.
+13. Markup contract: Preserve markup, tags, attributes, entities, and similar control sequences exactly. Translate only human-readable text outside markup and outside placeholder tokens.
+14. Output contract: Return exactly one JSON array of strings, with no characters before `[` or after `]`.
 
 Valid placeholder and markup handling:
 ["Click <a href=\"/x\">log out</a> and use @@PH195@@."]
